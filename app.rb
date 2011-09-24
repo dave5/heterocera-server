@@ -1,4 +1,7 @@
 # app.rb
+
+$:.unshift *Dir[File.dirname(__FILE__) + "/models"]
+
 require 'rubygems'
 require 'bundler'
 Bundler.require
@@ -15,13 +18,13 @@ configure do
   ActiveRecord::Base.establish_connection(
     config[environment]
   )
-
+end
 
 def path_to_tags(path)
   path.split('/')
 end
 
-def get_tuples(path, ext)
+def read_tuples(path, ext)
   tags    = path_to_tags(path)
   tuples  = Tuple.find_by_tag_list tags 
   
@@ -33,6 +36,8 @@ def get_tuples(path, ext)
     when 'xml'
       content_type :xml
       tuples.to_xml
+    when 'html'
+      
     end
   else
     error 404 do
@@ -41,10 +46,12 @@ def get_tuples(path, ext)
   end
 end
 
-def write_tuple(value, tags)
+def write_tuple(path, value)
+  tags = path_to_tags(path)
+
   unless tags.include?('*')
     if value.present?
-      tuple = Tuple.from_tags(value, tags) 
+      tuple = Tuple.from_tags!(value, tags) 
       content_type :json
       tuple.to_json
     else
@@ -59,28 +66,43 @@ def write_tuple(value, tags)
   end
 end
 
+def take_tuple(id)
+  tuple = Tuple.find(:first, :conditions => ["id = ? AND marked_for_delete_at IS NULL", id])
+
+  if tuple.present?
+    tuple.mark_for_deletion!
+    status 200
+  else
+    error 404 do
+      "No data found"
+    end
+  end
+end
+
 get '/read/*.*' do |path, ext|
-  get_tuples(path, ext)
+  read_tuples(path, ext)
 end
 
 get '/read/*' do
-  get_tuples(params[:splat][0], 'json')
+  read_tuples(params[:splat][0], 'json')
 end
 
 get '/write/*' do
-  write_tuple(params[:value], path_to_tags(params[:splat][0]))
+  write_tuple(params[:splat][0], params[:value])
 end
 
 post '/write/*' do
-  write_tuple(params[:value], path_to_tags(params[:splat][0]))
+  write_tuple(params[:splat][0], params[:value])
 end
 
 put '/write/*' do
-  write_tuple(params[:value], path_to_tags(params[:splat][0]))
+  write_tuple(params[:splat][0], params[:value])
 end
 
 get '/take/:id' do
+  take_tuple(params[:id])
 end
 
 delete '/take/:id' do
+  take_tuple(params[:id])
 end
