@@ -1,0 +1,24 @@
+#results
+  .title
+    %H1 Results
+
+  #tuples
+    - @tuples.each do |tuple|
+      #tuple
+        .date-created
+          Created at: 
+          = tuple.created_at
+        .id
+          ID:
+          = tuple.id
+        .value
+          Value: 
+          = tuple.value
+        .address
+          Address:
+          %a{:href => "/read/#{tuple.tags_to_path}.html"} 
+            ="/read/#{tuple.tags_to_path}"
+          .json  
+            %a{:href => "/read/#{tuple.tags_to_path}"} json
+          .xml
+            %a{:href => "/read/#{tuple.tags_to_path}.xml"} xml
