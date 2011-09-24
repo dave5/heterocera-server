@@ -24,6 +24,10 @@ class Tuple < ActiveRecord::Base
     update_attributes(:marked_for_delete_at => Time.now)
   end
 
+  def tags_to_path
+    tags.collect{|tag| tag.value}.join("/")
+  end
+
   def as_json(options=nil)
     {
       :id         => id,

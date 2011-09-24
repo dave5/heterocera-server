@@ -6,5 +6,6 @@ gem "activerecord"
 gem "sqlite3"
 gem "mysql2"
 gem 'json'
+gem 'haml'
 
 gem "ruby-debug"

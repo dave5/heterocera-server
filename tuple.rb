@@ -10,7 +10,7 @@ class Tuple < ActiveRecord::Base
     end
   end
 
-  def self.from_tags(value, tags)
+  def self.from_tags!(value, tags)
     tuple = new(:value => value)
     tags.each_index do |index|
       tuple.tags << Tag.new(:order => (index + 1), :value => tags[index])
@@ -18,6 +18,10 @@ class Tuple < ActiveRecord::Base
     tuple.save!
 
     tuple
+  end
+
+  def mark_for_deletion!
+    update_attributes(:marked_for_delete_at => Time.now)
   end
 
   def as_json(options=nil)

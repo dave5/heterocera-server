@@ -10,6 +10,9 @@ require 'sinatra/activerecord'
 require 'ruby-debug'
 require 'tuple'
 require 'tag'
+require 'haml'
+
+set :haml, :format => :html5
 
 configure do
   config = YAML::load(File.open('config/database.yml'))
@@ -26,18 +29,18 @@ end
 
 def read_tuples(path, ext)
   tags    = path_to_tags(path)
-  tuples  = Tuple.find_by_tag_list tags 
+  @tuples  = Tuple.find_by_tag_list tags 
   
-  if tuples.length > 0 
+  if @tuples.length > 0 
     case ext
     when 'json'
       content_type :json
-      tuples.to_json
+      @tuples.to_json
     when 'xml'
       content_type :xml
-      tuples.to_xml
+      @tuples.to_xml
     when 'html'
-      
+      haml :read
     end
   else
     error 404 do
