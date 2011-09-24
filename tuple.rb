@@ -3,7 +3,11 @@ class Tuple < ActiveRecord::Base
   has_many :tags, :dependent => :destroy
 
   def self.find_by_tag_list tag_list
-    find_by_sql(tag_list_to_sql(tag_list))
+    unless tag_list.uniq.to_s == '*'
+      find_by_sql(tag_list_to_sql(tag_list))
+    else
+      []
+    end
   end
 
   def self.from_tags(value, tags)
@@ -21,7 +25,7 @@ class Tuple < ActiveRecord::Base
       :id         => id,
       :value      => value,
       :created_at => created_at,
-      :tags       => tags.to_json
+      :tags       => tags
     }
   end
   
@@ -41,6 +45,7 @@ class Tuple < ActiveRecord::Base
            
           # create sub_select
           sql << "(SELECT tuple_id FROM tags WHERE (tags.order = #{order} and tags.value = '#{tag_list[i]}')) s#{order}"
+
           if first_entry.present?
             sql << " ON s#{first_entry}.tuple_id = s#{order}.tuple_id"
           else
@@ -51,7 +56,7 @@ class Tuple < ActiveRecord::Base
         end
       end
 
-      sql << 'tuples ON s1.tuple_id = tuples.id WHERE tuples.marked_for_delete_at IS NULL ORDER BY tuples.created_at DESC;'
+      sql << "tuples ON s#{first_entry}.tuple_id = tuples.id WHERE tuples.marked_for_delete_at IS NULL ORDER BY tuples.created_at DESC;"
 
     end
 
