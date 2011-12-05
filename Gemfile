@@ -8,4 +8,6 @@ gem "mysql2"
 gem 'json'
 gem 'haml'
 
+gem 'khi-rack-mongrel2', :git => 'https://github.com/dalyons/khi-rack-mongrel2'
+
 gem "ruby-debug"

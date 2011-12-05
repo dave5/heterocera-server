@@ -15,6 +15,12 @@ require 'app/config'
 require 'tuple'
 require 'tag'
 
+
+# get '*' do
+#   debugger
+#   request.env.to_json
+# end
+
 get '/read/*.*' do |path, ext|
   read_tuples(path, ext)
 end
