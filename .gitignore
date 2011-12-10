@@ -1,1 +1,7 @@
 .rvmrc
+config.sqlite
+config.ru
+mongrel2.conf
+files/**/*
+tmp/**/*
+run/**/*
