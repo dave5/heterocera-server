@@ -53,7 +53,7 @@ def write_tuple(path, value)
 end
 
 def take_tuple(id)
-  tuple = Tuple.find(:first, :conditions => ["id = ? AND marked_for_delete_at IS NULL", id])
+  tuple = Tuple.find(:first, :conditions => ["guid = ? AND marked_for_delete_at IS NULL", id])
 
   if tuple.present?
     tuple.mark_for_deletion!

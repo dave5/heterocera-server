@@ -2,7 +2,7 @@ class Tuple < ActiveRecord::Base
 
   has_many :tags, :dependent => :destroy
 
-  before_create  :set_defaults
+  before_create  :default_values
   before_destroy :delete_file
 
   def self.find_by_tag_list tag_list
@@ -101,7 +101,7 @@ class Tuple < ActiveRecord::Base
       File.delete(file_location) if File.exists?(file_location)
     end
 
-    def is_a_file?(value)
+    def self.is_a_file?(value)
       value_is_file = false
 
       if value.length > 1
@@ -113,7 +113,7 @@ class Tuple < ActiveRecord::Base
       return value_is_file
     end
 
-    def write_file(file_data, directory)
+    def self.write_file(file_data, directory)
 
       unless file_data &&
              (tmpfile = file_data[:tempfile]) &&
