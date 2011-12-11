@@ -2,7 +2,8 @@ class Tuple < ActiveRecord::Base
 
   has_many :tags, :dependent => :destroy
 
-  before_create :set_defaults
+  before_create  :set_defaults
+  before_destroy :delete_file
 
   def self.find_by_tag_list tag_list
     unless tag_list.uniq.to_s == '*'
@@ -94,6 +95,10 @@ class Tuple < ActiveRecord::Base
       self.is_file  ||= false
 
       true
+    end
+
+    def destroy_file
+      File.delete(file_location) if File.exists?(file_location)
     end
 
     def is_a_file?(value)

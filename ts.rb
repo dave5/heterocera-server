@@ -43,11 +43,3 @@ end
 delete '/take/:guid' do
   take_tuple(params[:guid])
 end
-
-get '/upload' do
-  haml :upload
-end
-
-post '/upload' do
-  debugger
-end

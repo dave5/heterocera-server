@@ -5,3 +5,4 @@ mongrel2.conf
 files/**/*
 tmp/**/*
 run/**/*
+Gemfile.lock
