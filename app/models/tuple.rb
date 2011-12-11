@@ -2,6 +2,8 @@ class Tuple < ActiveRecord::Base
 
   has_many :tags, :dependent => :destroy
 
+  before_create :set_defaults
+
   def self.find_by_tag_list tag_list
     unless tag_list.uniq.to_s == '*'
       find_by_sql(tag_list_to_sql(tag_list))
@@ -10,14 +12,21 @@ class Tuple < ActiveRecord::Base
     end
   end
 
-  def self.from_tags!(value, tags)
-    tuple = new(:value => value)
+  def self.from_tags!(value, tags, file_directory = "")
+    save_tuple = true
+
+    tuple_value = (is_a_file?(value)) ? value[:filename] : value
+    tuple = new(:value => tuple_value, :is_file => is_a_file?(value))
+
     tags.each_index do |index|
       tuple.tags << Tag.new(:order => (index + 1), :value => tags[index])
     end
-    tuple.save!
 
-    tuple
+    save_tuple = write_file(value, file_directory) if is_a_file?(value)
+
+    tuple.save! if save_tuple
+
+    [save_tuple, tuple]
   end
 
   def mark_for_deletion!
@@ -30,7 +39,7 @@ class Tuple < ActiveRecord::Base
 
   def as_json(options=nil)
     {
-      :id         => id,
+      :id         => guid,
       :value      => value,
       :created_at => created_at,
       :tags       => tags
@@ -40,6 +49,14 @@ class Tuple < ActiveRecord::Base
   def to_xml(options = {})
     options.merge!(:except => [:marked_for_delete_at, :updated_at], :include => [:tags])
     super(options)
+  end
+
+  def file_location
+    if is_file
+      File.join file_directory, value
+    else
+      null
+    end
   end
 
   private
@@ -68,4 +85,43 @@ class Tuple < ActiveRecord::Base
 
     end
 
+    def file_directory
+      File.join tags_to_path, guid
+    end
+
+    def default_values
+      self.guid     ||= Guid.new.to_s.gsub('-', '')
+      self.is_file  ||= false
+
+      true
+    end
+
+    def is_a_file?(value)
+      value_is_file = false
+
+      if value.length > 1
+        if value[:filename].present?
+          value_is_file = true
+        end
+      end
+
+      return value_is_file
+    end
+
+    def write_file(file_data, directory)
+
+      unless file_data &&
+             (tmpfile = file_data[:tempfile]) &&
+             (name = file_data[:filename])
+        return false
+      end
+
+      # create directory
+      FileUtils.mkdir_p(file_directory) unless File.exists?(file_directory)
+
+      # write file
+      File.copy(tmpfile.path, file_location)
+
+      return true
+    end
 end

@@ -7,6 +7,7 @@ gem "sqlite3"
 gem "mysql2"
 gem 'json'
 gem 'haml'
+gem 'guid'
 
 gem 'khi-rack-mongrel2', :git => 'https://github.com/dalyons/khi-rack-mongrel2'
 

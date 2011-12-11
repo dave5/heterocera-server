@@ -2,6 +2,8 @@
 
 set :views, File.dirname(__FILE__) + '/../app/views'
 set :haml, :format => :html5
+set :file_root, File.dirname(__FILE__) + '/../files'
+set :temp_dir, File.dirname(__FILE__) + '/../tmp'
 
 configure do
   config = YAML::load(File.open('config/database.yml'))

@@ -9,17 +9,12 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require 'ruby-debug'
 require 'haml'
+require 'guid'
 
 require 'app/core'
 require 'app/config'
 require 'tuple'
 require 'tag'
-
-
-# get '*' do
-#   debugger
-#   request.env.to_json
-# end
 
 get '/read/*.*' do |path, ext|
   read_tuples(path, ext)
@@ -41,10 +36,18 @@ put '/write/*' do
   write_tuple(params[:splat][0], params[:value])
 end
 
-get '/take/:id' do
-  take_tuple(params[:id])
+get '/take/:guid' do
+  take_tuple(params[:guid])
 end
 
-delete '/take/:id' do
-  take_tuple(params[:id])
+delete '/take/:guid' do
+  take_tuple(params[:guid])
+end
+
+get '/upload' do
+  haml :upload
+end
+
+post '/upload' do
+  debugger
 end
