@@ -31,6 +31,10 @@ class Tuple < ActiveRecord::Base
     [save_tuple, tuple]
   end
 
+  def self.marked_for_deletion
+    find :all, :conditions => ['marked_for_delete_at IS NOT NULL']
+  end
+
   def mark_for_deletion!
     update_attributes(:marked_for_delete_at => Time.now)
   end

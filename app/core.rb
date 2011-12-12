@@ -94,7 +94,7 @@ def compress_and_send(tuples)
     `tar -czf #{temp_tar} #{temp_name}`   
   end
 
-  # stream
+  # send file
   send_file File.join(settings.temp_dir, temp_tar), 
             :type => 'application/octet-stream', 
             :disposition => 'inline', 
