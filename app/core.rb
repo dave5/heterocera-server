@@ -16,12 +16,8 @@ def read_tuples(path, ext)
     when 'xml'
       content_type :xml
       @tuples.to_xml
-    when 'zip'
-      content_type 'application/octet-stream'
-
     when 'gz'
-      content_type 'application/octet-stream'
-
+      compress_and_send @tuples
     when 'html'
       haml :read
     end
@@ -69,4 +65,39 @@ def take_tuple(id)
       "No data found"
     end
   end
+end
+
+def compress_and_send(tuples)
+  # generate temp dir
+  temp_name = Guid.new.to_s.gsub('-', '')
+  temp_dir = File.join settings.temp_dir, temp_name
+  temp_tar = "#{temp_name}.tar.gz"
+  FileUtils.mkdir_p temp_dir
+
+  # write out tuple js as header file
+  File.open(File.join(temp_dir, 'json'), 'w') {|f| f.write(tuples.to_json) }
+
+  # for each tuple
+  tuples.each do |tuple|
+    if tuple.is_file
+      # create directory
+      file_dir = File.join temp_dir, tuple.guid
+      FileUtils.mkdir_p file_dir
+          
+      # copy file
+      FileUtils.cp File.join(settings.file_root, tuple.file_location), File.join(file_dir, tuple.value)
+    end
+  end
+
+  # compress
+  Dir.chdir(settings.temp_dir) do
+    `tar -czf #{temp_tar} #{temp_name}`   
+  end
+
+  # stream
+  send_file File.join(settings.temp_dir, temp_tar), 
+            :type => 'application/octet-stream', 
+            :disposition => 'inline', 
+            :filename => temp_tar
+
 end

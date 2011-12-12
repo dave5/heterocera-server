@@ -2,8 +2,7 @@ class Tuple < ActiveRecord::Base
 
   has_many :tags, :dependent => :destroy
 
-  after_initialize  :default_values
-  before_destroy    :delete_file
+  before_destroy :delete_file
 
   def self.find_by_tag_list tag_list
     unless tag_list.uniq.to_s == '*'
@@ -17,7 +16,9 @@ class Tuple < ActiveRecord::Base
     save_tuple = true
 
     tuple_value = (is_a_file?(value)) ? value[:filename] : value
-    tuple = new(:value => tuple_value, :is_file => is_a_file?(value))
+    tuple       = new(:value => tuple_value, 
+                      :is_file => is_a_file?(value), 
+                      :guid => Guid.new.to_s.gsub('-', ''))
 
     tags.each_index do |index|
       tuple.tags << Tag.new(:order => (index + 1), :value => tags[index])
@@ -26,7 +27,7 @@ class Tuple < ActiveRecord::Base
     save_tuple = tuple.write_file(value, file_directory) if is_a_file?(value)
 
     tuple.save! if save_tuple
-
+    
     [save_tuple, tuple]
   end
 
@@ -102,13 +103,6 @@ class Tuple < ActiveRecord::Base
 
     def file_directory
       File.join tags_to_path, guid
-    end
-
-    def default_values
-      self.guid     = Guid.new.to_s.gsub('-', '')
-      self.is_file  = false
-
-      true
     end
 
     def destroy_file
