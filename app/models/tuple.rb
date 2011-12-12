@@ -2,8 +2,8 @@ class Tuple < ActiveRecord::Base
 
   has_many :tags, :dependent => :destroy
 
-  before_create  :default_values
-  before_destroy :delete_file
+  after_initialize  :default_values
+  before_destroy    :delete_file
 
   def self.find_by_tag_list tag_list
     unless tag_list.uniq.to_s == '*'
@@ -23,7 +23,7 @@ class Tuple < ActiveRecord::Base
       tuple.tags << Tag.new(:order => (index + 1), :value => tags[index])
     end
 
-    save_tuple = write_file(value, file_directory) if is_a_file?(value)
+    save_tuple = tuple.write_file(value, file_directory) if is_a_file?(value)
 
     tuple.save! if save_tuple
 
@@ -53,11 +53,25 @@ class Tuple < ActiveRecord::Base
   end
 
   def file_location
-    if is_file
-      File.join file_directory, value
-    else
-      null
+    File.join file_directory, value
+  end
+
+  def write_file(file_data, directory)
+
+    unless file_data &&
+           (tmpfile = file_data[:tempfile]) &&
+           (name = file_data[:filename])
+      return false
     end
+
+    # create directory
+    location = File.join directory, file_directory
+    FileUtils.mkdir_p(location) unless File.exists?(location)
+
+    # write file
+    FileUtils.cp(tmpfile.path, File.join(directory, file_location))
+
+    return true
   end
 
   private
@@ -91,8 +105,8 @@ class Tuple < ActiveRecord::Base
     end
 
     def default_values
-      self.guid     ||= Guid.new.to_s.gsub('-', '')
-      self.is_file  ||= false
+      self.guid     = Guid.new.to_s.gsub('-', '')
+      self.is_file  = false
 
       true
     end
@@ -113,20 +127,4 @@ class Tuple < ActiveRecord::Base
       return value_is_file
     end
 
-    def self.write_file(file_data, directory)
-
-      unless file_data &&
-             (tmpfile = file_data[:tempfile]) &&
-             (name = file_data[:filename])
-        return false
-      end
-
-      # create directory
-      FileUtils.mkdir_p(file_directory) unless File.exists?(file_directory)
-
-      # write file
-      File.copy(tmpfile.path, file_location)
-
-      return true
-    end
 end

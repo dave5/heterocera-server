@@ -16,6 +16,12 @@ def read_tuples(path, ext)
     when 'xml'
       content_type :xml
       @tuples.to_xml
+    when 'zip'
+      content_type 'application/octet-stream'
+
+    when 'gz'
+      content_type 'application/octet-stream'
+
     when 'html'
       haml :read
     end
@@ -31,7 +37,7 @@ def write_tuple(path, value)
 
   unless tags.include?('*')
     if value.present?
-      saved, tuple = Tuple.from_tags!(value, tags, settings.temp_dir) 
+      saved, tuple = Tuple.from_tags!(value, tags, settings.file_root) 
       if saved
         content_type :json
         tuple.to_json
