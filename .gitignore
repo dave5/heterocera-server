@@ -2,7 +2,7 @@
 config.sqlite
 config.ru
 mongrel2.conf
-files/**/*
-tmp/**/*
-run/**/*
+files/
+tmp/
+run/
 Gemfile.lock
