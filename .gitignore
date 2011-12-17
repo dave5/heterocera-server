@@ -6,3 +6,4 @@ files/
 tmp/
 run/
 Gemfile.lock
+config/database.yml
