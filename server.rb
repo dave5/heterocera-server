@@ -11,8 +11,8 @@ require 'ruby-debug'
 require 'haml'
 require 'guid'
 
-require 'app/core'
-require 'app/config'
+require './app/core'
+require './app/config'
 require 'tuple'
 require 'tag'
 

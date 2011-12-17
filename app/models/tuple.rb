@@ -115,8 +115,8 @@ class Tuple < ActiveRecord::Base
 
     def self.is_a_file?(value)
       value_is_file = false
-
-      if value.length > 1
+        
+      if value.class == Hash
         if value[:filename].present?
           value_is_file = true
         end

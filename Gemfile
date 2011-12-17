@@ -11,4 +11,4 @@ gem 'guid'
 
 gem 'khi-rack-mongrel2', :git => 'https://github.com/dalyons/khi-rack-mongrel2'
 
-gem "ruby-debug"
+gem "ruby-debug19"
