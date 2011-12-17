@@ -7,7 +7,7 @@ require 'rack/handler/mongrel2'
 
 #Setup your own load paths here
 $LOAD_PATH.push(File.expand_path(File.dirname(__FILE__)))
-require 'ts'
+require 'server'
 
 #The connection specs are NOT optional, and they must 
 #be the opposite of what you declared in the Mongrel

@@ -1,5 +1,3 @@
-require 'server'
-
 namespace :heterocera do  
   
   namespace :server do
