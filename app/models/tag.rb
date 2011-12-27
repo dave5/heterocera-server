@@ -9,8 +9,4 @@ class Tag < ActiveRecord::Base
     }
   end
 
-  def to_xml(options=nil)
-    options.merge!(:only => [:value, :order])
-    super(options)
-  end
 end

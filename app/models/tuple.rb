@@ -53,8 +53,22 @@ class Tuple < ActiveRecord::Base
   end
   
   def to_xml(options = {})
-    options.merge!(:except => [:marked_for_delete_at, :updated_at], :include => [:tags])
-    super(options)
+    options[:indent] ||= 2
+    xml = options[:builder] ||= Builder::XmlMarkup.new(:indent => options[:indent])
+    xml.instruct! unless options[:skip_instruct]
+    xml.tuple do
+      xml.tag!(:id, guid)
+      xml.tag!(:value, value)
+      xml.tag!(:created_at, created_at)
+      xml.tags do
+        tags.each do |tag|
+          xml.tag do
+            xml.tag! :value, tag.value
+            xml.tag! :order, tag.order
+          end
+        end
+      end
+    end
   end
 
   def file_location
