@@ -130,7 +130,9 @@ class Tuple < ActiveRecord::Base
               GROUP BY
                 tags.tuple_id) AS culled_tuples
               WHERE'
-      sql << " culled_tuples.tag_count = #{tag_list.length} AND culled_tuples.marked_for_delete_at IS NULL ORDER BY culled_tuples.created_at DESC;"
+      sql << " culled_tuples.tag_count = #{tag_list.length} AND culled_tuples.marked_for_delete_at IS NULL 
+              ORDER BY 
+                culled_tuples.created_at DESC;"
 
     end
 
