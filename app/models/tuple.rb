@@ -5,11 +5,8 @@ class Tuple < ActiveRecord::Base
   before_destroy :delete_file
 
   def self.find_by_tag_list tag_list
-    unless tag_list.uniq.to_s == '*'
-      find_by_sql(tag_list_to_sql(tag_list))
-    else
-      []
-    end
+    tuples = []
+    tuples = find_by_sql(tag_list_to_sql(tag_list)) unless tag_list.uniq.to_s == '*'
   end
 
   def self.from_tags!(value, tags, file_directory = "")
@@ -96,7 +93,18 @@ class Tuple < ActiveRecord::Base
   private
     def self.tag_list_to_sql tag_list
       first_entry = nil
-      sql = 'SELECT tuples.* FROM '
+      sql = 'SELECT 
+              culled_tuples.* 
+            FROM
+              (SELECT
+                selected_tuples.*,
+                tags.tuple_id,
+                tags.order,
+                tags.value as tag_value,
+                COUNT(tags.tuple_id) as tag_count
+              FROM
+              (SELECT tuples.* FROM '
+
 
       tag_list.each_index do |i|
         unless tag_list[i] == '*'
@@ -115,7 +123,14 @@ class Tuple < ActiveRecord::Base
         end
       end
 
-      sql << "tuples ON s#{first_entry}.tuple_id = tuples.id WHERE tuples.marked_for_delete_at IS NULL ORDER BY tuples.created_at DESC;"
+      sql << "tuples ON s#{first_entry}.tuple_id = tuples.id"
+      sql << ') selected_tuples
+              LEFT JOIN
+                tags ON selected_tuples.id = tags.tuple_id
+              GROUP BY
+                tags.tuple_id) AS culled_tuples
+              WHERE'
+      sql << " culled_tuples.tag_count = #{tag_list.length} AND culled_tuples.marked_for_delete_at IS NULL ORDER BY culled_tuples.created_at DESC;"
 
     end
 

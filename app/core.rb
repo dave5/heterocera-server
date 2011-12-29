@@ -5,7 +5,7 @@ def path_to_tags(path)
 end
 
 def read_tuples(path, ext)
-  tags    = path_to_tags(path)
+  tags     = path_to_tags(path)
   @tuples  = Tuple.find_by_tag_list tags 
   
   if @tuples.length > 0 
