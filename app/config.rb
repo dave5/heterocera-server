@@ -12,5 +12,6 @@ configure do
   ActiveRecord::Base.establish_connection(
     config[environment]
   )
+  ActiveRecord::Base.connection.execute "SET collation_connection = 'utf8_general_ci'"
 end
 

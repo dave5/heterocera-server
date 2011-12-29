@@ -43,3 +43,7 @@ end
 delete '/take/:guid' do
   take_tuple(params[:guid])
 end
+
+not_found do
+  haml :home
+end

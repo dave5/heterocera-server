@@ -1,6 +1,6 @@
 class CreateTags < ActiveRecord::Migration
   def self.up
-    create_table :tags do |t|
+    create_table(:tags, :options => 'DEFAULT CHARSET=utf8') do |t|
       t.integer :tuple_id, :order
       t.string  :value
       t.timestamps
