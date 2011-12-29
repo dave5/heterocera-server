@@ -6,19 +6,20 @@ class Tuple < ActiveRecord::Base
 
   def self.find_by_tag_list tag_list
     tuples = []
-    tuples = find_by_sql(tag_list_to_sql(tag_list)) unless tag_list.uniq.to_s == '*'
+    tuples = find_by_sql(tag_list_to_sql(tag_list)) unless tag_list.uniq[0].to_s == '*'
   end
 
   def self.from_tags!(value, tags, file_directory = "")
     save_tuple = true
 
     tuple_value = (is_a_file?(value)) ? value[:filename] : value
-    tuple       = new(:value => tuple_value, 
-                      :is_file => is_a_file?(value), 
-                      :guid => Guid.new.to_s.gsub('-', ''))
+    tuple       = new(:value    => tuple_value, 
+                      :is_file  => is_a_file?(value), 
+                      :guid     => Guid.new.to_s.gsub('-', ''))
 
     tags.each_index do |index|
-      tuple.tags << Tag.new(:order => (index + 1), :value => tags[index])
+      tuple.tags << Tag.new(:order => (index + 1), 
+                            :value => tags[index])
     end
 
     save_tuple = tuple.write_file(value, file_directory) if is_a_file?(value)
@@ -93,7 +94,8 @@ class Tuple < ActiveRecord::Base
   private
     def self.tag_list_to_sql tag_list
       first_entry = nil
-      sql = 'SELECT 
+      sql = '
+            SELECT 
               culled_tuples.* 
             FROM
               (SELECT
