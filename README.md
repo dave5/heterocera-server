@@ -11,6 +11,8 @@ This is done by treating the memory space as a web server - where address locati
 
 By reducing all interactions to http GET and POST action even simple platforms can record and retrieve data.
 
+This is not meant to be a NoSQL system - it's designed to simplify and decouple communications between a wide range of systems.
+
 Usage
 -----
 
@@ -20,9 +22,9 @@ Heterocera handles data in the following manner:
 
 A real world example might be data from a water meter:
 
-    [sensor_id, data_stream_id, time] = data
+    [sensor_location, data_stream_id, time] = data
 
-    ["water_meter", "dce7ae54-3d46-1188-2ea4-d9ebc19ac26d", "1325206004"] = 400
+    ["upper_landing_strip", "water_tank_level", "1325206004"] = 400
 
 This is combined with the standard READ, WRITE and TAKE actions allowed in a tuple space to generate URLs. 
 
@@ -30,25 +32,93 @@ This is combined with the standard READ, WRITE and TAKE actions allowed in a tup
 * READ is used to passively retrieve data. 
 * TAKE retrieves data and deletes data from the space.
 
-To WRITE into the space:
+To **WRITE** into the space:
 
-    http://localhost:4567/write/water_meter/dce7ae54-3d46-1188-2ea4-d9ebc19ac26d/1325206004?value=400
+    http://localhost:4567/write/upper_landing_strip/water_tank_level/1325206004?value=400
 
-To READ:
+To **READ** data from the space:
 
-    http://localhost:4567/read/water_meter/dce7ae54-3d46-1188-2ea4-d9ebc19ac26d/1325206004
+    http://localhost:4567/read/upper_landing_strip/water_tank_level/1325206004
 
-To TAKE:
+To **TAKE** data from the space:
 
-    http://localhost:4567/take/water_meter/dce7ae54-3d46-1188-2ea4-d9ebc19ac26d/1325206004
+    http://localhost:4567/take/upper_landing_strip/water_tank_level/1325206004
 
-WRITE and TAKE operations require explicit addresses. READ operations will accept wild cards. 
+WRITE and TAKE operations require explicit URLs. READ operations will accept wild cards in the URL. 
 The '*' character is used as a wild card. To continue the above example if you wanted to read all the stored values 
 for the water meter over time:
 
-    http://localhost:4567/read/water_meter/dce7ae54-3d46-1188-2ea4-d9ebc19ac26d/*
+    http://localhost:4567/read/upper_landing_strip/water_tank_level/*
     
 If you wanted to read all the values for all the data streams at a given time:
 
-    http://localhost:4567/read/water_meter/*/1325206004     
-  
+    http://localhost:4567/read/upper_landing_strip/*/1325206004     
+
+Data types
+----------
+
+By default Heterocera returns data as JSON. So the following READ:
+
+    http://localhost:4567/read/upper_landing_strip/water_tank_level/1325206004
+
+returns:
+
+    {
+      "id": "a93120f9d1ac1b148e52d25e60306bd5",
+      "value": "400",
+      "created_at": "2011-12-30T14:30:57+13:00",
+      "tags": [
+        {
+        "value": "upper_landing_strip",
+        "order": 1
+        },
+        {
+        "value": "water_tank_level",
+        "order": 2
+        },
+        {
+        "value": "1325206004",
+        "order": 3
+        }
+      ]
+    }
+
+Heterocera supports:
+
+* JSON
+* XML
+* HTML
+* GZip
+* Zip
+
+Alternative data formats are accessed by appending the relevant file extension. So the following READ:
+
+    http://localhost:4567/read/upper_landing_strip/water_tank_level/1325206004.xml
+
+returns:
+
+    <tuples type="array">
+      <tuple>
+        <id>a93120f9d1ac1b148e52d25e60306bd5</id>
+        <value>400</value>
+        <created_at>2011-12-30 14:30:57 +1300</created_at>
+        <tags>
+          <tag>
+            <value>upper_landing_strip</value>
+            <order>1</order>
+          </tag>
+          <tag>
+            <value>water_tank_level</value>
+            <order>2</order>
+          </tag>
+          <tag>
+            <value>1325206004</value>
+            <order>3</order>
+          </tag>
+        </tags>
+      </tuple>
+    </tuples>
+
+System Chit-chat
+----------------
+
