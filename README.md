@@ -1,5 +1,8 @@
-Hetrocera Server
-================
+# Hetrocera Server
+
+A sinatra based associative memory system by David ten Have.
+
+## Introduction
 
 Hetrocera Server is an implementation of an associative memory system. 
 It is inspired by the concept of a [tuple space](http://en.wikipedia.org/wiki/Tuple_space) 
@@ -11,10 +14,12 @@ This is done by treating the memory space as a web server - where address locati
 
 By reducing all interactions to http GET and POST action even simple platforms can record and retrieve data.
 
-This is not meant to be a NoSQL system - it's designed to simplify and decouple communications between a wide range of systems.
+This is not meant to be a NoSQL system. It is designed to:
 
-Usage
------
+* simplify and decouple communications between a range of systems of varying capability
+* enable sensor ecosystems
+
+## Usage
 
 Heterocera handles data in the following manner:
 
@@ -54,8 +59,7 @@ If you wanted to read all the values for all the data streams at a given time:
 
     http://localhost:4567/read/upper_landing_strip/*/1325206004     
 
-Data types
-----------
+## Data types
 
 By default Heterocera returns data as JSON. So the following READ:
 
@@ -85,11 +89,11 @@ returns:
 
 Heterocera supports:
 
-* JSON
-* XML
-* HTML
-* GZip
-* Zip
+* JSON (.json)
+* XML (.xml)
+* HTML (.html)
+* GZip (.gz)
+* Zip (.zip)
 
 Alternative data formats are accessed by appending the relevant file extension. So the following READ:
 
@@ -119,6 +123,24 @@ returns:
       </tuple>
     </tuples>
 
-System Chit-chat
-----------------
+## System Chit-chat
 
+All communication occurs over HTTP. TAKE and READ operations are GET only. WRITE operations can by executed using GET, POST and PUT.
+
+WRITE operations rely on an 'value' parameter. If using a multi-part form is it possible upload a file into the space. To retrieve 
+the file contents append READ operations with .gz (a tar gz archive) or .zip (zip archive) file extensions, any other extensions will display the file name in the 'value'
+field. 
+
+## Support Tools
+
+### Ruby
+
+There is a [ruby gem](https://github.com/dave5/heterocera-gem ) that can be used to communicate with a Heterocera Server.
+
+## Installation
+
+Clone and pray... sorry, will make this more slick in the next few days.
+
+## Contribute
+
+Yes please!
