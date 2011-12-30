@@ -4,15 +4,15 @@ A sinatra based associative memory system by David ten Have.
 
 ## Introduction
 
-Hetrocera Server is an implementation of an associative memory system. 
+Hetrocera is an implementation of an associative memory system. 
 It is inspired by the concept of a [tuple space](http://en.wikipedia.org/wiki/Tuple_space) 
 and by the work of [David Gelernter](http://en.wikipedia.org/wiki/David_Gelernter) 
 (outlined in his book [Mirror Worlds](http://www.amazon.com/Mirror-Worlds-Software-Universe-Shoebox-How/dp/019507906X)).
 
-Hetrocera Server is designed to enable easy communication in heterogeneous environments (e.g. Arduino applications and web applications).
+Hetrocera is designed to enable easy communication in heterogeneous environments (e.g. Arduino applications and web applications).
 This is done by treating the memory space as a web server - where address locations are URLs. Heterocera will handle single value, rich JSON structures and files. 
 
-By reducing all interactions to http GET and POST action even simple platforms can record and retrieve data.
+By reducing all interactions to HTTP GET and POST requests even simple platforms can record and retrieve data.
 
 This is not meant to be a NoSQL system. It is designed to:
 
