@@ -8,24 +8,7 @@ def read_tuples(path, ext)
   tags     = path_to_tags(path)
   @tuples  = Tuple.find_by_tag_list tags 
   
-  if @tuples.length > 0 
-    case ext
-    when 'json'
-      content_type :json
-      @tuples.to_json
-    when 'xml'
-      content_type :xml
-      @tuples.to_xml
-    when 'gz'
-      compress_and_send @tuples
-    when 'html'
-      haml :read
-    end
-  else
-    error 404 do
-      "No data found"
-    end
-  end
+  render_tuples @tuples, ext
 end
 
 def write_tuple(path, value)
@@ -54,15 +37,20 @@ def write_tuple(path, value)
   end
 end
 
-def take_tuple(id)
-  tuple = Tuple.find(:first, :conditions => ["guid = ? AND marked_for_delete_at IS NULL", id])
+def take_tuples(path, ext)
+  tags = path_to_tags(path)
 
-  if tuple.present?
-    tuple.mark_for_deletion!
-    status 200
+  unless tags.include?('*')
+    @tuples  = Tuple.find_by_tag_list tags
+
+    @tuples.each do |tuple|
+      tuple.mark_for_deletion! if tuple.present?
+    end
+
+    render_tuples @tuples, ext
   else
-    error 404 do
-      "No data found"
+    error 400 do
+      "Wildcards cannot be used for writing data"
     end
   end
 end
@@ -100,4 +88,25 @@ def compress_and_send(tuples)
             :disposition => 'inline', 
             :filename => temp_tar
 
+end
+
+def render_tuples(tuples, ext)
+  if tuples.length > 0 
+    case ext
+    when 'json'
+      content_type :json
+      tuples.to_json
+    when 'xml'
+      content_type :xml
+      tuples.to_xml
+    when 'gz'
+      compress_and_send tuples
+    when 'html'
+      haml :render
+    end
+  else
+    error 404 do
+      "No data found"
+    end
+  end
 end

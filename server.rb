@@ -36,12 +36,12 @@ put '/write/*' do
   write_tuple(params[:splat][0], params[:value])
 end
 
-get '/take/:guid' do
-  take_tuple(params[:guid])
+get '/take/*.*' do |path, ext|
+  take_tuples(path, ext)
 end
 
-delete '/take/:guid' do
-  take_tuple(params[:guid])
+get '/take/*' do 
+  take_tuples(params[:splat][0], 'json')
 end
 
 not_found do
