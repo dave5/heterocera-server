@@ -6,9 +6,10 @@
     %link{:rel => 'shortcut icon', :href => '/images/favicon.ico'}
 
     %link{:rel => 'stylesheet', :href => '/css/blueprint/screen.css'}
-    %link{:rel => 'stylesheet', :href => '/css/blueprint/print.css'}
     /[if lt IE 8]
       %link{:rel => 'stylesheet', :href => '/css/blueprint/ie.css'}
+
+    %link{:rel => 'stylesheet', :href => '/css/blueprint/plugins/fancy-type/screen.css'}
 
     %link{:rel => 'stylesheet', :href => '/css/home.css'}
     
@@ -19,7 +20,7 @@
 
       %div{:class => 'span-24 navigation'}
 
-      %div{:class => 'span-14 prepend-5 append-5'}
+      %div{:class => 'span-12 prepend-5'}
         %h2 Remember something...
 
         %form
@@ -36,9 +37,13 @@
 
           %input{:type => 'submit', :value => 'Remember'}
 
-      %div{:class => 'span-8'}
-        %p foo
           
-      %div{:class => 'span-7'}
-        %p foo
+      %div{:class => 'span-3 more-info'}
+        %ul
+          %li
+            %a{:href => 'foo'} About
+          %li 
+            %a{:href => 'foo'} Tools
+          %li
+            %a{:href => 'foo'} Source code
 
