@@ -1,1 +1,44 @@
-oh hai!
+%html{:xmlns => "http://www.w3.org/1999/xhtml", "xml:lang" => "en", :lang => "en"}
+  %head
+    %meta{:charset => 'utf-8'}
+    %title Heterocera
+
+    %link{:rel => 'shortcut icon', :href => '/images/favicon.ico'}
+
+    %link{:rel => 'stylesheet', :href => '/css/blueprint/screen.css'}
+    %link{:rel => 'stylesheet', :href => '/css/blueprint/print.css'}
+    /[if lt IE 8]
+      %link{:rel => 'stylesheet', :href => '/css/blueprint/ie.css'}
+
+    %link{:rel => 'stylesheet', :href => '/css/home.css'}
+    
+  %body
+    %div{:class => 'container background'}
+
+      %div{:class => 'span-8 prepend-16 logo'}
+
+      %div{:class => 'span-24 navigation'}
+
+      %div{:class => 'span-14 prepend-5 append-5'}
+        %h2 Remember something...
+
+        %form
+          %p
+            %label{:for => 'info'}
+              Information
+              %br
+            %input{:type => 'text', :class => 'title no-user-interaction', :id => 'info', :value => 'Something you\'d like to remember...'}
+          %p
+            %label{:for => 'address'}
+              Address
+              %br
+            %input{:type => 'text', :class => 'title no-user-interaction', :id => 'address', :value => '/address/for/your/memory'}
+
+          %input{:type => 'submit', :value => 'Remember'}
+
+      %div{:class => 'span-8'}
+        %p foo
+          
+      %div{:class => 'span-7'}
+        %p foo
+

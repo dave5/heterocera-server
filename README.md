@@ -10,7 +10,7 @@ and by the work of [David Gelernter](http://en.wikipedia.org/wiki/David_Gelernte
 (outlined in his book [Mirror Worlds](http://www.amazon.com/Mirror-Worlds-Software-Universe-Shoebox-How/dp/019507906X)).
 
 Heterocera is designed to enable easy communication in heterogeneous environments (e.g. Arduino applications and web applications).
-This is done by treating the memory space as a web server - where address locations are URLs. Heterocera will handle single value, rich JSON structures and files. 
+This is done by treating the memory space as a web server - where address locations are URLs. Heterocera will handle single values, rich JSON structures and files. 
 
 By reducing all interactions to HTTP GET and POST requests even simple platforms can record and retrieve data.
 
@@ -21,7 +21,7 @@ This is not meant to be a NoSQL system. It is designed to:
 
 ## Usage
 
-Heterocera handles data in the following manner:
+Heterocera handles data in the following manner (note that the data element is optional):
 
     [address_element1, address_element2, ... address_elementN] = data
 

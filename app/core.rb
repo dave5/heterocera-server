@@ -15,19 +15,13 @@ def write_tuple(path, value)
   tags = path_to_tags(path)
 
   unless tags.include?('*')
-    if value.present?
-      saved, tuple = Tuple.from_tags!(value, tags, settings.file_root) 
-      if saved
-        content_type :json
-        tuple.to_json
-      else
-        error 500 do
-          "There was a problem saving the data"
-        end
-      end
+    saved, tuple = Tuple.from_tags!(value, tags, settings.file_root) 
+    if saved
+      content_type :json
+      tuple.to_json
     else
-      error 400 do
-        "Please provide a value"
+      error 500 do
+        "There was a problem saving the data"
       end
     end
   else
