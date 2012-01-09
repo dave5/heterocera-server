@@ -104,3 +104,8 @@ def render_tuples(tuples, ext)
     end
   end
 end
+
+def valid_action?(path)
+  action = path.split("/")[1].downcase
+  ['read', 'write', 'take'].include?(action)
+end

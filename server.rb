@@ -45,5 +45,5 @@ get '/take/*' do
 end
 
 not_found do
-  haml :home
+  haml :home unless valid_action?(request.path_info)
 end
