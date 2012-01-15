@@ -1,5 +1,8 @@
 # core.rb
 
+COMPRESSION_ZIP = 'zip'
+COMPRESSION_GZIP = 'gz'
+
 def path_to_tags(path)
   path.split('/')
 end
@@ -49,11 +52,10 @@ def take_tuples(path, ext)
   end
 end
 
-def compress_and_send(tuples)
+def compress_and_send(tuples, compression_method = COMPRESSION_GZIP)
   # generate temp dir
   temp_name = Guid.new.to_s.gsub('-', '')
   temp_dir = File.join settings.temp_dir, temp_name
-  temp_tar = "#{temp_name}.tar.gz"
   FileUtils.mkdir_p temp_dir
 
   # write out tuple js as header file
@@ -72,15 +74,24 @@ def compress_and_send(tuples)
   end
 
   # compress
-  Dir.chdir(settings.temp_dir) do
-    `tar -czf #{temp_tar} #{temp_name}`   
+  case compression_method
+  when COMPRESSION_GZIP
+    file_name = "#{temp_name}.tar.gz"
+    Dir.chdir(settings.temp_dir) do
+      `tar -czf #{file_name} #{temp_name}`   
+    end
+  when COMPRESSION_ZIP
+    file_name = "#{temp_name}.zip"
+    Dir.chdir(settings.temp_dir) do
+      `zip -r #{file_name} #{temp_name}`   
+    end
   end
 
   # send file
-  send_file File.join(settings.temp_dir, temp_tar), 
+  send_file File.join(settings.temp_dir, file_name), 
             :type => 'application/octet-stream', 
             :disposition => 'inline', 
-            :filename => temp_tar
+            :filename => file_name
 
 end
 
@@ -93,8 +104,10 @@ def render_tuples(tuples, ext)
     when 'xml'
       content_type :xml
       tuples.to_xml
-    when 'gz'
-      compress_and_send tuples
+    when COMPRESSION_GZIP
+      compress_and_send tuples, COMPRESSION_GZIP
+    when COMPRESSION_ZIP
+      compress_and_send tuples, COMPRESSION_ZIP
     when 'html'
       haml :render
     end

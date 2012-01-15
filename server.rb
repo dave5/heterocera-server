@@ -1,4 +1,4 @@
-# ts.rb
+# server.rb
 
 $:.unshift *Dir[File.dirname(__FILE__) + "/app/**"]
 
