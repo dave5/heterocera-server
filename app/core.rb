@@ -18,7 +18,7 @@ def write_tuple(path, value)
   tags = path_to_tags(path)
 
   unless tags.include?('*')
-    saved, tuple = Tuple.from_tags!(value, tags, settings.file_root) 
+    saved, tuple = Tuple.from_tags!(value, tags) 
     if saved
       content_type :json
       tuple.to_json
@@ -119,6 +119,7 @@ def render_tuples(tuples, ext)
 end
 
 def valid_action?(path)
-  action = path.split("/")[1].downcase
-  ['read', 'write', 'take'].include?(action)
+  action = path.split("/")[1]
+  return false if action.blank?
+  ['read', 'write', 'take'].include?(action.downcase)
 end

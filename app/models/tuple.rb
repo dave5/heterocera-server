@@ -9,7 +9,8 @@ class Tuple < ActiveRecord::Base
     tuples = find_by_sql(tag_list_to_sql(tag_list)) unless tag_list.uniq[0].to_s == '*'
   end
 
-  def self.from_tags!(value, tags, file_directory = "")
+  def self.from_tags!(value, tags)
+
     save_tuple = true
 
     tuple_value = (is_a_file?(value)) ? value[:filename] : value
@@ -22,7 +23,7 @@ class Tuple < ActiveRecord::Base
                             :value => tags[index])
     end
 
-    save_tuple = tuple.write_file(value, file_directory) if is_a_file?(value)
+    save_tuple = tuple.write_file(value) if is_a_file?(value)
 
     tuple.save! if save_tuple
     
@@ -37,8 +38,10 @@ class Tuple < ActiveRecord::Base
     update_attributes(:marked_for_delete_at => Time.now)
   end
 
-  def tags_to_path
-    tags.collect{|tag| tag.value}.join("/")
+  def tags_to_path(pop_depth = 0)
+    tag_array = tags.collect{|tag| tag.value}
+    tag_array.pop(pop_depth) if pop_depth > 0
+    tag_array.join("/")
   end
 
   def as_json(options=nil)
@@ -73,7 +76,7 @@ class Tuple < ActiveRecord::Base
     File.join file_directory, value
   end
 
-  def write_file(file_data, directory)
+  def write_file(file_data)
 
     unless file_data &&
            (tmpfile = file_data[:tempfile]) &&
@@ -82,11 +85,10 @@ class Tuple < ActiveRecord::Base
     end
 
     # create directory
-    location = File.join directory, file_directory
-    FileUtils.mkdir_p(location) unless File.exists?(location)
+    FileUtils.mkdir_p(file_directory) unless File.exists?(file_directory)
 
     # write file
-    FileUtils.cp(tmpfile.path, File.join(directory, file_location))
+    FileUtils.cp(tmpfile.path, file_location)
 
     return true
   end
@@ -139,11 +141,23 @@ class Tuple < ActiveRecord::Base
     end
 
     def file_directory
-      File.join tags_to_path, guid
+      File.join Sinatra::Application.settings.file_root, tags_to_path, guid
     end
 
     def destroy_file
-      File.delete(file_location) if File.exists?(file_location)
+      FileUtils.rm(file_location)
+      Dir.rmdir file_directory
+
+      containing_dir = file_directory.split("/")
+      containing_dir.pop
+
+      while (Dir.entries(File.join(containing_dir))-['.','..']).empty? ||
+            (File.join(containing_dir) != Sinatra::Application.settings.file_root)
+        Dir.rmdir File.join(containing_dir)
+        containing_dir.pop          
+      end 
+
+      true
     end
 
     def self.is_a_file?(value)

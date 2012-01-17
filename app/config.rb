@@ -8,7 +8,8 @@ set :temp_dir, File.dirname(__FILE__) + '/../tmp'
 configure do
   config = YAML::load(File.open('config/database.yml'))
   environment = Sinatra::Application.environment.to_s
-  ActiveRecord::Base.logger = Logger.new($stdout)
+  ActiveRecord::Base.logger       = Logger.new($stdout)
+  ActiveRecord::Base.logger.level = 1
   ActiveRecord::Base.establish_connection(
     config[environment]
   )
