@@ -139,7 +139,9 @@ There is a [ruby gem](https://github.com/dave5/heterocera-gem ) that can be used
 
 ## Installation
 
-Clone and pray... sorry, will make this more slick in the next few days.
+bundle install
+rake db:migrate
+ruby application.rb
 
 ## Contribute
 
