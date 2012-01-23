@@ -16,7 +16,7 @@ end
 
 def write_tuple(path, value)
   tags = path_to_tags(path)
-
+debugger
   unless tags.include?('*')
     saved, tuple = Tuple.from_tags!(value, tags) 
     if saved
@@ -41,7 +41,7 @@ def take_tuples(path, ext)
     @tuples  = Tuple.find_by_tag_list tags
 
     @tuples.each do |tuple|
-      tuple.mark_for_deletion! if tuple.present?
+      tuple.mark_for_deletion! unless tuple.empty?
     end
 
     render_tuples @tuples, ext
@@ -120,6 +120,6 @@ end
 
 def valid_action?(path)
   action = path.split("/")[1]
-  return false if action.blank?
+  return false if action == nil
   ['read', 'write', 'take'].include?(action.downcase)
 end

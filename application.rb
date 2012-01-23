@@ -1,27 +1,27 @@
-# server.rb
-
-$:.unshift *Dir[File.dirname(__FILE__) + "/app/**"]
-
 require 'rubygems'
-require 'bundler'
-Bundler.require
+require 'bundler/setup'
 require 'sinatra'
-require 'sinatra/activerecord'
-require 'ruby-debug'
-require 'haml'
-require 'guid'
+require File.join(File.dirname(__FILE__), 'environment')
 
-require './app/core'
-require './app/config'
-require 'tuple'
-require 'tag'
+configure do
+  set :views, File.dirname(__FILE__) + '/views'
+  set :haml, :format => :html5
+  set :file_root, File.dirname(__FILE__) + '/../files'
+  set :temp_dir, File.dirname(__FILE__) + '/../tmp'
+end
+
+error do
+  e = request.env['sinatra.error']
+  Kernel.puts e.backtrace.join("\n")
+  'Application error'
+end
+
+get '/read/*' do 
+  read_tuples(params[:splat][0], 'json')
+end
 
 get '/read/*.*' do |path, ext|
   read_tuples(path, ext)
-end
-
-get '/read/*' do
-  read_tuples(params[:splat][0], 'json')
 end
 
 get '/write/*' do

@@ -1,11 +1,22 @@
-class Tuple < ActiveRecord::Base
+class Tuple 
 
-  has_many :tags, :dependent => :destroy
+  include DataMapper::Resource
 
-  before_destroy :delete_file
+  property :id,                   Serial
+  property :value,                Text, :lazy => [:show]
+  property :guid,                 String
+  property :is_file,              Boolean
+  property :marked_for_delete_at, DateTime
+  property :created_at,           DateTime
+  property :updated_at,           DateTime
+
+  has n, :tags
+
+  before :destroy, :destroy_file
 
   def self.find_by_tag_list tag_list
     tuples = []
+    debugger
     tuples = find_by_sql(tag_list_to_sql(tag_list)) unless tag_list.uniq[0].to_s == '*'
   end
 
@@ -13,19 +24,28 @@ class Tuple < ActiveRecord::Base
 
     save_tuple = true
 
-    tuple_value = (is_a_file?(value)) ? value[:filename] : value
-    tuple       = new(:value    => tuple_value, 
-                      :is_file  => is_a_file?(value), 
-                      :guid     => Guid.new.to_s.gsub('-', ''))
+    tuple_value = (Tuple.is_a_file?(value)) ? value[:filename] : value
 
-    tags.each_index do |index|
-      tuple.tags << Tag.new(:order => (index + 1), 
-                            :value => tags[index])
-    end
+    tuple       = Tuple.new
+    tuple.value = tuple_value
+    tuple.is_file  = Tuple.is_a_file?(value)
+    tuple.guid     = Guid.new.to_s.gsub('-', '')
+    tuple.created_at = Time.now
+    tuple.updated_at = Time.now
 
     save_tuple = tuple.write_file(value) if is_a_file?(value)
 
-    tuple.save! if save_tuple
+    if save_tuple
+    
+      tags.each_index do |index|
+        tag = Tag.create
+        tag.display_order = (index + 1)
+        tag.value         = tags[index]
+        tuple.tags << tag 
+      end
+
+      tuple.save
+    end
     
     [save_tuple, tuple]
   end
@@ -35,7 +55,7 @@ class Tuple < ActiveRecord::Base
   end
 
   def mark_for_deletion!
-    update_attributes(:marked_for_delete_at => Time.now)
+    update_attributes(:marked_for_delete_at => Time.now, :updated_at => Time.now)
   end
 
   def tags_to_path(pop_depth = 0)
@@ -103,7 +123,7 @@ class Tuple < ActiveRecord::Base
               (SELECT
                 selected_tuples.*,
                 tags.tuple_id,
-                tags.order,
+                tags.display_order,
                 tags.value as tag_value,
                 COUNT(tags.tuple_id) as tag_count
               FROM
@@ -115,9 +135,9 @@ class Tuple < ActiveRecord::Base
           order = i + 1
            
           # create sub_select
-          sql << "(SELECT tuple_id FROM tags WHERE (tags.order = #{order} and tags.value = '#{tag_list[i]}')) s#{order}"
+          sql << "(SELECT tuple_id FROM tags WHERE (tags.display_order = #{order} and tags.value = '#{tag_list[i]}')) s#{order}"
 
-          if first_entry.present?
+          unless first_entry.nil?
             sql << " ON s#{first_entry}.tuple_id = s#{order}.tuple_id"
           else
             first_entry = order
@@ -145,6 +165,8 @@ class Tuple < ActiveRecord::Base
     end
 
     def destroy_file
+      return true unless is_file
+
       FileUtils.rm(file_location)
       Dir.rmdir file_directory
 
@@ -164,7 +186,7 @@ class Tuple < ActiveRecord::Base
       value_is_file = false
         
       if value.class == Hash
-        if value[:filename].present?
+        unless value[:filename].empty?
           value_is_file = true
         end
       end

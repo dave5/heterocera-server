@@ -1,0 +1,51 @@
+body {
+  font-size: 11px;
+  height: auto;
+  padding-bottom: 20px;
+  text-align: left;
+}
+
+.navigation {
+  padding-top: 20px;
+  margin-top: 5px;
+}
+
+.container {
+  margin-top: 10px;
+}
+
+p {
+  overflow: hidden;
+}
+
+input.text, input.title {
+  width: 400px;
+}
+
+.background {
+  background: url('/images/big-background.png');
+  background-repeat: no-repeat;
+  height: 550px;
+  background-position:right top;
+}
+
+.logo {
+  background: url('/images/logo.png');
+  background-repeat: no-repeat;
+  height: 100px;
+  background-position:right top;
+  padding-bottom: 10px;
+}
+
+input.no-user-interaction{
+  color: aaa;
+}
+
+.more-info ul{
+  padding-left: 8px;
+  list-style-type: none;
+}
+
+a {
+  color: #394d5d;
+}
